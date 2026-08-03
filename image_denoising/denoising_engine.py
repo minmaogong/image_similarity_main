@@ -1,4 +1,5 @@
 import torch
+from tqdm import tqdm
 
 
 # 训练一个轮次
@@ -48,7 +49,7 @@ def test_step(model, test_loader, loss_fn, device):
     model.eval()
     total_loss = 0
     with torch.no_grad():
-        for noise_img, target_img in test_loader:
+        for noise_img, target_img in tqdm(test_loader, desc="测试"):
             noise_img = noise_img.to(device)
             target_img = target_img.to(device)
             # 前向传播，得到输出值
