@@ -42,7 +42,7 @@ class NoiseImageDataset(Dataset):
 def create_datasets():
     # 定义图像转换操作（调整大小，转为Tensor）
     transform = T.Compose([
-        T.Resize((IMG_W, IMG_H)),
+        T.Resize((IMG_H, IMG_W)), # 高度就是行，宽度就是列，所以 IMG_H x IMG_W = 高 x 宽 = 行 x 列
         T.ToTensor(),
     ])
     # 创建数据集
