@@ -2,7 +2,8 @@ import os
 
 import torch
 from PIL import Image
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, random_split
+import torchvision.transforms as T
 
 from denoising_config import *
 from common.utils import sorted_alphanum
@@ -37,6 +38,19 @@ class NoiseImageDataset(Dataset):
         img_noise_tensor = torch.clamp(img_noise_tensor, 0, 1) # clamp: 限制张量的值在指定范围内
         return img_noise_tensor, img_tensor # 返回噪声图片和原始图片 (input, target)
 
+# 创建数据集并划分
+def create_datasets():
+    # 定义图像转换操作（调整大小，转为Tensor）
+    transform = T.Compose([
+        T.Resize((IMG_W, IMG_H)),
+        T.ToTensor(),
+    ])
+    # 创建数据集
+    dataset = NoiseImageDataset(IMG_PATH, transform=transform)
+    # 划分数据集
+    train_dataset, val_dataset, test_dataset = random_split(dataset, [TRAIN_RATIO, VAL_RATIO, TEST_RATIO])
+    return train_dataset, val_dataset, test_dataset
+
 if __name__ == "__main__":
-    dataset = NoiseImageDataset(IMG_PATH)
-    print(dataset.image_names)
+    train_dataset, val_dataset, test_dataset = create_datasets()
+    print(f"train_dataset: {len(train_dataset)}, val_dataset: {len(val_dataset)}, test_dataset: {len(test_dataset)}")
