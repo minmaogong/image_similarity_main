@@ -40,7 +40,7 @@ def val_step(model, val_loader, loss_fn, device):
             loss = loss_fn(output, target_img)
 
             total_loss += loss.item()
-    # 本轮验证结束，计算平均损失
+    # 计算平均损失
     return total_loss / len(val_loader)
 
 # 测试一个轮次
@@ -58,5 +58,5 @@ def test_step(model, test_loader, loss_fn, device):
             loss = loss_fn(output, target_img)
 
             total_loss += loss.item()
-    # 本轮验证结束，计算平均损失
+    # 计算平均损失
     return total_loss / len(test_loader)
