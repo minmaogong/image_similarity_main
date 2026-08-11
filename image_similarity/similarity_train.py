@@ -16,7 +16,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # 2. 创建数据集
-    train_dataset, val_dataset, test_dataset = create_dataset()
+    train_dataset, val_dataset, _ = create_dataset()
     print("=====================数据集创建完成=====================")
 
     # 3. 创建数据加载器
