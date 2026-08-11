@@ -22,7 +22,7 @@ class ImageDataset(Dataset):
         # 1. 根据图片的完整访问路径
         image_path = os.path.join(self.image_dir, self.image_names[idx])
         # 2. 打开图片
-        image = Image.open(image_path)
+        image = Image.open(image_path).convert('RGB')
         # 3. 应用转换操作，得到Tensor
         if self.transform:
             img_tensor = self.transform(image)
