@@ -8,9 +8,11 @@ from chromadb import EmbeddingFunction, Embeddings
 from chromadb.api.types import Images
 from PIL import Image
 import torchvision.transforms as T
+from tqdm import tqdm
 
 from common.utils import sorted_alphanum
 from similarity_config import *
+from similarity_model import ConvEncoder
 
 # 自定义嵌入函数
 class ImageEmbeddingFunction(EmbeddingFunction[Images]):
@@ -35,15 +37,19 @@ def get_id2images(image_dir, transform):
     # 读取目录下所有图片文件名
     image_names = sorted_alphanum(os.listdir(image_dir))
     # 遍历每个文件名，打开图片进行转换
-    for i, image_name in enumerate(image_names):
-        # 1.1 构建图片的完整访问路径
-        image_path = os.path.join(image_dir, image_name)
-        # 1.2 打开图片
-        image = Image.open(image_path).convert('RGB')
-        # 1.3 应用转换操作，得到Tensor
-        img_tensor = transform(image)
-        # 1.4 转换成ndarray，保存到字典
-        id2images[str(i)] = img_tensor.numpy()
+    with tqdm(total=len(image_names)) as pbar:
+        for i, image_name in enumerate(image_names):
+            # 1.1 构建图片的完整访问路径
+            image_path = os.path.join(image_dir, image_name)
+            # 1.2 打开图片
+            image = Image.open(image_path).convert('RGB')
+            # 1.3 应用转换操作，得到Tensor
+            img_tensor = transform(image)
+            # 1.4 转换成ndarray，保存到字典
+            id2images[str(i)] = img_tensor.numpy()
+
+            # 更新进度条
+            pbar.update(1)
 
     return id2images
 
@@ -81,7 +87,7 @@ def create_embeddings(encoder):
     print("开始写入Chroma数据库...")
     # 分批写入
     batchs = ceil(len(ids) / CHROMA_INSERT_BATCH_SIZE)
-    for i in range(batchs):
+    for i in tqdm(range(batchs), desc="写入数据"):
         start = min(i * CHROMA_INSERT_BATCH_SIZE, len(ids))
         end = min((i+1) * CHROMA_INSERT_BATCH_SIZE, len(ids))
         collection.upsert(
@@ -92,6 +98,21 @@ def create_embeddings(encoder):
 
 
 # 相似图片搜索
-def search_similar_ids(collections, image, cnt):
-    pass
+def search_similar_ids(collection, image, cnt):
+    result = collection.query(
+        query_images=image.numpy(),
+        n_results=cnt,
+    )
+    similar_image_ids = [ int(id) for id in result['ids'][0] ]
+    return similar_image_ids
+
+if __name__ == '__main__':
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # 1. 加载嵌入模型
+    encoder = ConvEncoder()
+    encoder.load_state_dict(torch.load(ENCODER_MODEL_NAME))
+    print("模型加载完毕!")
+    # 2. 写入所有数据，生成嵌入向量
+    create_embeddings(encoder)
+
 

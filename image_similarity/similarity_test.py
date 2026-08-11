@@ -7,6 +7,7 @@ from similarity_config import *
 from similarity_data import create_dataset
 from similarity_model import ConvEncoder, ConvDecoder
 from similarity_engine import evaluate
+from similarity_embeddings import get_embedding_collection, search_similar_ids
 
 
 def test_new_data(encoder, decoder, test_loader, device):
@@ -54,3 +55,13 @@ if __name__ == "__main__":
     test_loss = evaluate(encoder, decoder, test_loader, loss_fn, device)
 
     print(f"测试集误差：{test_loss:.4f}")
+
+    print("===============================================================")
+
+    # 6. 从测试集中获取一张新图片
+    image, _ = test_dataset[0]
+    print(image.shape)
+
+    # 7. 获取Chroma集合
+    collection = get_embedding_collection(encoder)
+    print(collection.peek(limit=5))
