@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     # 4. 加载模型
     model = ConvDenoiser().to(device)
-    state_dict = torch.load(DENOISER_MODEL_NAME)
+    state_dict = torch.load(DENOISER_MODEL_NAME, map_location=device)
     model.load_state_dict(state_dict)
     print("=====================模型加载完成=====================")
 

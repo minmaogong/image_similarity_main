@@ -43,8 +43,8 @@ if __name__ == "__main__":
     # 4. 加载模型
     encoder = ConvEncoder().to(device)
     decoder = ConvDecoder().to(device)
-    encoder.load_state_dict(torch.load(ENCODER_MODEL_NAME))
-    decoder.load_state_dict(torch.load(DECODER_MODEL_NAME))
+    encoder.load_state_dict(torch.load(ENCODER_MODEL_NAME, map_location=device))
+    decoder.load_state_dict(torch.load(DECODER_MODEL_NAME, map_location=device))
 
     # 5. 损失函数
     loss_fn = nn.MSELoss()
