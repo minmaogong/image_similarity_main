@@ -98,7 +98,7 @@ def create_embeddings(encoder):
 
 
 # 相似图片搜索
-def search_similar_ids(collection, image, cnt):
+def search_similar_ids(collection, image, cnt=5):
     result = collection.query(
         query_images=image.numpy(),
         n_results=cnt,

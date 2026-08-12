@@ -1,6 +1,9 @@
+from IPython.core.pylabtools import figsize
 from torch.utils.data import DataLoader
 import torch.nn as nn
 import matplotlib.pyplot as plt
+import os
+from PIL import Image
 
 from common.utils import *
 from similarity_config import *
@@ -64,4 +67,30 @@ if __name__ == "__main__":
 
     # 7. 获取Chroma集合
     collection = get_embedding_collection(encoder)
-    print(collection.peek(limit=5))
+    # print(collection.peek(limit=5))
+
+    # 8. 测试，得到相似图片id
+    similar_image_ids = search_similar_ids(collection, image=image, cnt=5)
+    print("相似图片id：", similar_image_ids)
+
+    # 画图显示
+    fig, axes = plt.subplots(nrows=2, ncols=5, figsize=figsize(25, 4))
+    # 输入图片
+    image = image.permute(1, 2, 0).cpu().numpy()
+    axes[0, 2].imshow(image)
+    # 相似图片
+    for i in range(len(similar_image_ids)):
+        # 拼接文件名
+        image_name = str(similar_image_ids[i]) + ".jpg"
+        # 读取图片
+        image_path = os.path.join(IMG_PATH, image_name)
+        image = Image.open(image_path).convert('RGB')
+        # 画图显示
+        axes[1, i].imshow(image)
+
+    for ax in axes.flat:
+        ax.set_axis_off()
+    plt.show()
+
+
+
