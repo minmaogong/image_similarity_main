@@ -11,8 +11,8 @@ import torchvision.transforms as T
 from tqdm import tqdm
 
 from common.utils import sorted_alphanum
-from similarity_config import *
-from similarity_model import ConvEncoder
+from image_similarity.similarity_config import *
+from image_similarity.similarity_model import ConvEncoder
 
 # 自定义嵌入函数
 class ImageEmbeddingFunction(EmbeddingFunction[Images]):
